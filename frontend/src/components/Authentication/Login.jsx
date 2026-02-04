@@ -19,6 +19,7 @@ const Login = () => {
                     border="1px solid black"
                     width="100%"
                     h="2.5rem"
+                    pl="1rem"
                     placeholder="Enter your email"
                     onChange={(e) => setEmail(e.target.value)}
                 />
@@ -30,19 +31,20 @@ const Login = () => {
                         border="1px solid black"
                         width="100%"
                         h="2.5rem"
+                        pl="1rem"
                         type={show ? "text" : "password"}
                         placeholder="Enter your password"
                         onChange={(e) => setPassword(e.target.value)}
                     />
-                    <InputRightElement width="4.5rem" display="flex" alignItems="center">
-                        <Button h="1.75rem" size="sm" colorScheme="cyan" onClick={handleClick}>
+                    <InputRightElement width="4.5rem" top="50%" transform="translateY(-50%)">
+                        <Button h="1.75rem" size="sm" colorPalette="cyan" onClick={handleClick}>
                             {show ? "Hide" : "Show"}
                         </Button>
                     </InputRightElement>
                 </InputGroup>
             </Field.Root>
             <Button
-                colorScheme="cyan"
+                colorPalette="cyan"
                 width="100%"
                 style={{ marginTop: 15 }}
                 onClick={submitHandler}
