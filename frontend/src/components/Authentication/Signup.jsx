@@ -107,7 +107,7 @@ const Signup = () => {
             localStorage.setItem("userInfo", JSON.stringify(data));
             setLoading(false);
             // navigate to chat or home
-            history.push("/chat");
+            history.push("/chats");
         } catch (error) {
             toaster.create({
                 title: "Error Occurred!",

@@ -48,7 +48,7 @@ const Login = () => {
                 duration: 5000,
                 closable: true,
             });
-            history.push("/chat");
+            history.push("/chats");
         } catch (error) {
             toaster.create({
                 title: "Error Occurred!",
