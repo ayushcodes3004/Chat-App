@@ -1,8 +1,5 @@
 import React from 'react'
-import { VStack } from "@chakra-ui/layout"
-import { Field } from "@chakra-ui/react"
-import { Input, InputGroup, InputRightElement } from "@chakra-ui/input"
-import { Button } from "@chakra-ui/react"
+import { VStack, Field, Input, InputGroup, Button } from "@chakra-ui/react"
 import { toaster } from "@/components/ui/toaster"
 import axios from 'axios'
 import { useHistory } from 'react-router-dom'
@@ -61,7 +58,7 @@ const Login = () => {
         }
     }
     return (
-        <VStack spacing="5px" color='black'>
+        <VStack gap="5px" color='black'>
             <Field.Root id="email" required>
                 <Field.Label>Email</Field.Label>
                 <Input
@@ -76,22 +73,24 @@ const Login = () => {
             </Field.Root>
             <Field.Root id="password" required>
                 <Field.Label>Password</Field.Label>
-                <InputGroup>
+                <InputGroup
+                    endElement={
+                        <Button h="1.75rem" size="sm" colorPalette="cyan" onClick={handleClick}>
+                            {show ? "Hide" : "Show"}
+                        </Button>
+                    }
+                >
                     <Input
                         border="1px solid black"
                         width="100%"
                         h="2.5rem"
                         pl="1rem"
+                        pr="4.5rem"
                         value={password}
                         type={show ? "text" : "password"}
                         placeholder="Enter your password"
                         onChange={(e) => setPassword(e.target.value)}
                     />
-                    <InputRightElement width="4.5rem" top="50%" transform="translateY(-50%)">
-                        <Button h="1.75rem" size="sm" colorPalette="cyan" onClick={handleClick}>
-                            {show ? "Hide" : "Show"}
-                        </Button>
-                    </InputRightElement>
                 </InputGroup>
             </Field.Root>
             <Button
@@ -99,7 +98,7 @@ const Login = () => {
                 width="100%"
                 style={{ marginTop: 15 }}
                 onClick={submitHandler}
-                isLoading={loading}
+                loading={loading}
             >
                 Login
             </Button>
