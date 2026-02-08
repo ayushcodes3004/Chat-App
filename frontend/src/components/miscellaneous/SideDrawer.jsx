@@ -1,5 +1,6 @@
-import { Button, Box, Text } from '@chakra-ui/react';
+import { Button, Box, Text, Drawer, Input, Spinner, CloseButton } from '@chakra-ui/react';
 import { Tooltip } from '@/components/ui/tooltip';
+import { toaster } from '@/components/ui/toaster';
 import { Menu } from "@chakra-ui/react"
 import { Icon } from "@chakra-ui/react"
 import { FaBell, FaSearch, FaChevronDown } from 'react-icons/fa'
@@ -8,6 +9,8 @@ import { Avatar, Portal } from "@chakra-ui/react"
 import { ChatState } from "../../Context/ChatProvider.jsx"
 import ProfileModal from './ProfileModal.jsx';
 import { useHistory } from "react-router-dom";
+import axios from "axios";
+import ChatLoading from '../ChatLoading.jsx';
 
 const SideDrawer = () => {
     const [search, setSearch] = React.useState("");
@@ -15,17 +18,88 @@ const SideDrawer = () => {
     const [loading, setLoading] = React.useState(false);
     const [loadingChat, setLoadingChat] = React.useState(false);
     const [isProfileOpen, setIsProfileOpen] = React.useState(false);
-    const { user } = ChatState();
+    const [isDrawerOpen, setIsDrawerOpen] = React.useState(false);
+    const { user, chats, setChats, setSelectedChat } = ChatState();
     const history = useHistory();
     const logoutHandler = () => {
         localStorage.removeItem("userInfo");
         history.push("/");
     }
+
+    const handleSearch = async () => {
+        if (!search) {
+            toaster.create({
+                title: "Please Enter something in search",
+                type: "warning",
+                duration: 3000,
+            });
+            return;
+        }
+
+        try {
+            setLoading(true);
+
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${user.token}`,
+                },
+            };
+
+            const { data } = await axios.get(`/api/user?search=${search}`, config);
+
+            setLoading(false);
+            if (!data.length) {
+                toaster.create({
+                    title: "No users found",
+                    type: "info",
+                    duration: 3000,
+                });
+            }
+            setSearchResult(data);
+        } catch (error) {
+            toaster.create({
+                title: "Error Occured!",
+                description: "Failed to Load the Search Results",
+                type: "error",
+                duration: 3000,
+            });
+            setLoading(false);
+        }
+    };
+
+    const accessChat = async (userId) => {
+        console.log(userId);
+
+        try {
+            setLoadingChat(true);
+            const config = {
+                headers: {
+                    "Content-type": "application/json",
+                    Authorization: `Bearer ${user.token}`,
+                },
+            };
+            const { data } = await axios.post(`/api/chat`, { userId }, config);
+
+            if (!chats.find((c) => c._id === data._id)) setChats([data, ...chats]);
+            setSelectedChat(data);
+            setLoadingChat(false);
+            setIsDrawerOpen(false);
+        } catch (error) {
+            toaster.create({
+                title: "Error fetching the chat",
+                description: error.message,
+                type: "error",
+                duration: 3000,
+            });
+            setLoadingChat(false);
+        }
+    };
+
     return (
         <>
             <Box display="flex" justifyContent="space-between" alignItems="center" bg="white" w="100%" p="5px 10px 5px 10px" borderWidth="5px">
                 <Tooltip content="Search Users to chat" positioning={{ placement: 'bottom-end' }}>
-                    <Button variant='ghost' _focus={{ outline: "none", boxShadow: "none" }}>
+                    <Button variant='ghost' _focus={{ outline: "none", boxShadow: "none" }} onClick={() => setIsDrawerOpen(true)}>
                         <Icon as={FaSearch} />
                         <Text display={{ base: "none", md: "flex" }} px={4}>Search User</Text>
                     </Button>
@@ -73,6 +147,65 @@ const SideDrawer = () => {
                 </div>
             </Box>
             <ProfileModal user={user} isOpen={isProfileOpen} onClose={() => setIsProfileOpen(false)} />
+            <Drawer.Root placement="start" open={isDrawerOpen} onOpenChange={(details) => setIsDrawerOpen(details.open)}>
+                <Portal>
+                    <Drawer.Backdrop />
+                    <Drawer.Positioner>
+                        <Drawer.Content>
+                            <Drawer.Header borderBottomWidth="1px">
+                                <Drawer.Title>Search Users</Drawer.Title>
+                            </Drawer.Header>
+                            <Drawer.Body>
+                                <Box display="flex" pb={2}>
+                                    <Input
+                                        placeholder="Search by name or email"
+                                        mr={2}
+                                        value={search}
+                                        onChange={(e) => setSearch(e.target.value)}
+                                    />
+                                    <Button onClick={handleSearch}>Go</Button>
+                                </Box>
+                                {loading ? (
+                                    <ChatLoading />
+                                ) : (
+                                    searchResult?.map((u) => (
+                                        <Box
+                                            key={u._id}
+                                            onClick={() => accessChat(u._id)}
+                                            cursor="pointer"
+                                            bg="#E8E8E8"
+                                            _hover={{ background: "#38B2AC", color: "white" }}
+                                            w="100%"
+                                            display="flex"
+                                            alignItems="center"
+                                            color="black"
+                                            px={3}
+                                            py={2}
+                                            mb={2}
+                                            borderRadius="lg"
+                                        >
+                                            <Avatar.Root size="sm" mr={2}>
+                                                <Avatar.Fallback name={u.name} />
+                                                <Avatar.Image src={u.pic} />
+                                            </Avatar.Root>
+                                            <Box>
+                                                <Text>{u.name}</Text>
+                                                <Text fontSize="xs">
+                                                    <b>Email: </b>{u.email}
+                                                </Text>
+                                            </Box>
+                                        </Box>
+                                    ))
+                                )}
+                                {loadingChat && <ChatLoading />}
+                            </Drawer.Body>
+                            <Drawer.CloseTrigger asChild>
+                                <CloseButton size="sm" />
+                            </Drawer.CloseTrigger>
+                        </Drawer.Content>
+                    </Drawer.Positioner>
+                </Portal>
+            </Drawer.Root>
         </>
     )
 }

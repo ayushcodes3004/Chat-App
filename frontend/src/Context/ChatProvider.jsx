@@ -9,6 +9,8 @@ export const ChatProvider = ({ children }) => {
         const userInfo = JSON.parse(localStorage.getItem("userInfo"));
         return userInfo;
     });
+    const [selectedChat, setSelectedChat] = useState();
+    const [chats, setChats] = useState([]);
 
     const history = useHistory();
 
@@ -20,7 +22,7 @@ export const ChatProvider = ({ children }) => {
     }, [history])
 
     return (
-        <ChatContext.Provider value={{ user, setUser }}>
+        <ChatContext.Provider value={{ user, setUser, selectedChat, setSelectedChat, chats, setChats }}>
             {children}
         </ChatContext.Provider>
     )
