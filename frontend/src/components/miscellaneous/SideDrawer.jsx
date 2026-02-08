@@ -6,13 +6,21 @@ import { FaBell, FaSearch, FaChevronDown } from 'react-icons/fa'
 import React from 'react'
 import { Avatar, Portal } from "@chakra-ui/react"
 import { ChatState } from "../../Context/ChatProvider.jsx"
+import ProfileModal from './ProfileModal.jsx';
+import { useHistory } from "react-router-dom";
 
 const SideDrawer = () => {
     const [search, setSearch] = React.useState("");
     const [searchResult, setSearchResult] = React.useState([]);
     const [loading, setLoading] = React.useState(false);
     const [loadingChat, setLoadingChat] = React.useState(false);
+    const [isProfileOpen, setIsProfileOpen] = React.useState(false);
     const { user } = ChatState();
+    const history = useHistory();
+    const logoutHandler = () => {
+        localStorage.removeItem("userInfo");
+        history.push("/");
+    }
     return (
         <>
             <Box display="flex" justifyContent="space-between" alignItems="center" bg="white" w="100%" p="5px 10px 5px 10px" borderWidth="5px">
@@ -56,14 +64,15 @@ const SideDrawer = () => {
                         <Portal>
                             <Menu.Positioner>
                                 <Menu.Content>
-                                    <Menu.Item value="new-txt">My Profile</Menu.Item>
-                                    <Menu.Item value="new-file">Logout</Menu.Item>
+                                    <Menu.Item value="profile" onClick={() => setIsProfileOpen(true)}>My Profile</Menu.Item>
+                                    <Menu.Item value="logout" onClick={logoutHandler}>Logout</Menu.Item>
                                 </Menu.Content>
                             </Menu.Positioner>
                         </Portal>
                     </Menu.Root>
                 </div>
             </Box>
+            <ProfileModal user={user} isOpen={isProfileOpen} onClose={() => setIsProfileOpen(false)} />
         </>
     )
 }
