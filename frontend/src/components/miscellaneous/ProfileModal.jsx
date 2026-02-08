@@ -1,9 +1,21 @@
 import { Button, CloseButton, Dialog, Portal, IconButton, Text, Image } from "@chakra-ui/react";
 import { LuEye } from "react-icons/lu";
+import { useState } from "react";
 
-const ProfileModal = ({ user, isOpen, onClose }) => {
+const ProfileModal = ({ user, children }) => {
+    const [open, setOpen] = useState(false);
+
     return (
-        <Dialog.Root size="lg" placement="center" open={isOpen} onOpenChange={(details) => !details.open && onClose()}>
+        <Dialog.Root size="lg" placement="center" open={open} onOpenChange={(e) => setOpen(e.open)}>
+            <Dialog.Trigger asChild>
+                {children ? (
+                    <span>{children}</span>
+                ) : (
+                    <IconButton variant="ghost" aria-label="View Profile">
+                        <LuEye />
+                    </IconButton>
+                )}
+            </Dialog.Trigger>
             <Portal>
                 <Dialog.Backdrop />
                 <Dialog.Positioner>
@@ -36,7 +48,7 @@ const ProfileModal = ({ user, isOpen, onClose }) => {
                             </Text>
                         </Dialog.Body>
                         <Dialog.Footer>
-                            <Button onClick={onClose}>Close</Button>
+                            <Button onClick={() => setOpen(false)}>Close</Button>
                         </Dialog.Footer>
                         <Dialog.CloseTrigger asChild>
                             <CloseButton size="sm" />
