@@ -5,7 +5,6 @@ import { useState } from "react";
 const ProfileModal = ({ user, children, open: controlledOpen, onClose }) => {
     const [internalOpen, setInternalOpen] = useState(false);
 
-    // Use controlled mode if open prop is provided
     const isControlled = controlledOpen !== undefined;
     const open = isControlled ? controlledOpen : internalOpen;
     const setOpen = isControlled

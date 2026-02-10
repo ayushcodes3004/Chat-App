@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, use } from 'react'
 import { ChatState } from '../Context/ChatProvider'
 import { Box, Text, IconButton, Spinner, Input, Field } from '@chakra-ui/react'
 import { LuArrowLeft } from 'react-icons/lu'
@@ -8,6 +8,10 @@ import UpdateGroupChatModal from './miscellaneous/UpdateGroupModal'
 import ScrollableChat from './ScrollableChat'
 import axios from 'axios'
 import { toaster } from './ui/toaster'
+import { io } from "socket.io-client";
+
+const ENDPOINT = "http://localhost:5000";
+var socket, selectedChatCompare;
 
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     const { user, selectedChat, setSelectedChat } = ChatState();
@@ -15,6 +19,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     const [messages, setMessages] = useState([]);
     const [loading, setLoading] = useState(false);
     const [newMessage, setNewMessage] = useState("");
+    const [socketConnected, setSocketConnected] = useState(false);
 
     const fetchMessages = async () => {
         if (!selectedChat) return;
@@ -29,6 +34,8 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             // console.log(data);
             setMessages(data);
             setLoading(false);
+
+            socket.emit("join chat", selectedChat._id);
         } catch (error) {
             toaster.create({
                 title: "Error Occured!",
@@ -42,8 +49,29 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     };
 
     useEffect(() => {
+        socket = io(ENDPOINT);
+        socket.emit("setup", user);
+        socket.on("connected", () => {
+            console.log("Socket Connected");
+            setSocketConnected(true);
+        });
+    }, []);
+
+    useEffect(() => {
         fetchMessages();
+        selectedChatCompare = selectedChat;
     }, [selectedChat]);
+
+    useEffect(() => {
+        socket.on("message recieved", (newMessageRecieved) => {
+            if (!selectedChatCompare || selectedChatCompare._id !== newMessageRecieved.chat._id) {
+                // give notification
+            }
+            else {
+                setMessages([...messages, newMessageRecieved]);
+            }
+        });
+    });
 
     const sendMessage = async (event) => {
         // Logic to send message
@@ -62,6 +90,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                     chatId: selectedChat._id,
                 }, config);
                 // console.log(data);
+                socket.emit("new message", data);
                 setMessages([...messages, data]);
             } catch (error) {
                 toaster.create({
@@ -74,6 +103,8 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             }
         }
     }
+
+
 
     const typingHandler = (event) => {
         setNewMessage(event.target.value);
