@@ -13,6 +13,7 @@ const ChatBox = ({ fetchAgain, setFetchAgain }) => {
             p={3}
             bg="white"
             w={{ base: "100%", md: "68%" }}
+            h="100%"
             borderRadius="lg"
             border="1px solid"
             borderColor="gray.200"
