@@ -19,6 +19,7 @@ const SideDrawer = () => {
     const [loading, setLoading] = React.useState(false);
     const [loadingChat, setLoadingChat] = React.useState(false);
     const [isDrawerOpen, setIsDrawerOpen] = React.useState(false);
+    const [isProfileOpen, setIsProfileOpen] = React.useState(false);
     const { user, chats, setChats, setSelectedChat } = ChatState();
     const history = useHistory();
     const logoutHandler = () => {
@@ -140,14 +141,13 @@ const SideDrawer = () => {
                         <Portal>
                             <Menu.Positioner>
                                 <Menu.Content>
-                                    <ProfileModal user={user}>
-                                        <Menu.Item value="profile">My Profile</Menu.Item>
-                                    </ProfileModal>
+                                    <Menu.Item value="profile" onClick={() => setIsProfileOpen(true)}>My Profile</Menu.Item>
                                     <Menu.Item value="logout" onClick={logoutHandler}>Logout</Menu.Item>
                                 </Menu.Content>
                             </Menu.Positioner>
                         </Portal>
                     </Menu.Root>
+                    <ProfileModal user={user} open={isProfileOpen} onClose={() => setIsProfileOpen(false)} />
                 </div>
             </Box>
             <Drawer.Root placement="start" open={isDrawerOpen} onOpenChange={(details) => setIsDrawerOpen(details.open)}>

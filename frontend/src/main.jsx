@@ -9,11 +9,12 @@ import App from './App.jsx'
 const system = createSystem(defaultConfig)
 
 createRoot(document.getElementById('root')).render(
-  <ChatProvider>
-    <BrowserRouter>
+
+  <BrowserRouter>
+    <ChatProvider>
       <ChakraProvider value={system}>
         <App />
       </ChakraProvider>
-    </BrowserRouter>
-  </ChatProvider>,
+    </ChatProvider>
+  </BrowserRouter>,
 )

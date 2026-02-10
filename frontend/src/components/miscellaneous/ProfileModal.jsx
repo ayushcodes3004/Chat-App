@@ -2,20 +2,29 @@ import { Button, CloseButton, Dialog, Portal, IconButton, Text, Image } from "@c
 import { LuEye } from "react-icons/lu";
 import { useState } from "react";
 
-const ProfileModal = ({ user, children }) => {
-    const [open, setOpen] = useState(false);
+const ProfileModal = ({ user, children, open: controlledOpen, onClose }) => {
+    const [internalOpen, setInternalOpen] = useState(false);
+
+    // Use controlled mode if open prop is provided
+    const isControlled = controlledOpen !== undefined;
+    const open = isControlled ? controlledOpen : internalOpen;
+    const setOpen = isControlled
+        ? (val) => { if (!val && onClose) onClose(); }
+        : setInternalOpen;
 
     return (
         <Dialog.Root size="lg" placement="center" open={open} onOpenChange={(e) => setOpen(e.open)}>
-            <Dialog.Trigger asChild>
-                {children ? (
-                    <span>{children}</span>
-                ) : (
-                    <IconButton variant="ghost" aria-label="View Profile">
-                        <LuEye />
-                    </IconButton>
-                )}
-            </Dialog.Trigger>
+            {!isControlled && (
+                <Dialog.Trigger asChild>
+                    {children ? (
+                        <span>{children}</span>
+                    ) : (
+                        <IconButton variant="ghost" aria-label="View Profile">
+                            <LuEye />
+                        </IconButton>
+                    )}
+                </Dialog.Trigger>
+            )}
             <Portal>
                 <Dialog.Backdrop />
                 <Dialog.Positioner>
