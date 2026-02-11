@@ -11,7 +11,7 @@ import {
 } from "@chakra-ui/react";
 import { LuEye } from "react-icons/lu";
 import { toaster } from "../ui/toaster";
-import axios from "axios";
+import api from "../../config/axiosConfig";
 import { useState } from "react";
 import { ChatState } from "../../Context/ChatProvider";
 import UserBadgeItem from "../UserAvatar/UserBadgeItem";
@@ -41,7 +41,7 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
                     Authorization: `Bearer ${user.token}`,
                 },
             };
-            const { data } = await axios.get(`/api/user?search=${search}`, config);
+            const { data } = await api.get(`/api/user?search=${search}`, config);
             console.log(data);
             setLoading(false);
             setSearchResult(data);
@@ -67,7 +67,7 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
                     Authorization: `Bearer ${user.token}`,
                 },
             };
-            const { data } = await axios.put(
+            const { data } = await api.put(
                 `/api/chat/rename`,
                 {
                     chatId: selectedChat._id,
@@ -122,7 +122,7 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
                     Authorization: `Bearer ${user.token}`,
                 },
             };
-            const { data } = await axios.put(
+            const { data } = await api.put(
                 `/api/chat/groupadd`,
                 {
                     chatId: selectedChat._id,
@@ -167,7 +167,7 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
                     Authorization: `Bearer ${user.token}`,
                 },
             };
-            const { data } = await axios.put(
+            const { data } = await api.put(
                 `/api/chat/groupremove`,
                 {
                     chatId: selectedChat._id,

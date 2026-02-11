@@ -6,13 +6,15 @@ import ProfileModal from './miscellaneous/ProfileModal'
 import { getSender, getSenderFull } from '../config/ChatLogics'
 import UpdateGroupChatModal from './miscellaneous/UpdateGroupModal'
 import ScrollableChat from './ScrollableChat'
-import axios from 'axios'
+import api from '../config/axiosConfig'
 import { toaster } from './ui/toaster'
 import { io } from "socket.io-client";
 import Lottie from 'react-lottie';
 import animationData from '../animations/typing.json';
 
-const ENDPOINT = "http://localhost:5000";
+const ENDPOINT = process.env.NODE_ENV === 'production'
+    ? '/'  // In production, use relative path since frontend is served from same domain as backend
+    : "http://localhost:5000";
 var socket, selectedChatCompare;
 
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
@@ -44,7 +46,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                     Authorization: `Bearer ${user.token}`,
                 },
             };
-            const { data } = await axios.get(`/api/message/${selectedChat._id}`, config);
+            const { data } = await api.get(`/api/message/${selectedChat._id}`, config);
             // console.log(data);
             setMessages(data);
             setLoading(false);
@@ -114,7 +116,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                     },
                 };
                 setNewMessage("");
-                const { data } = await axios.post("/api/message", {
+                const { data } = await api.post("/api/message", {
                     content: newMessage,
                     chatId: selectedChat._id,
                 }, config);
@@ -264,3 +266,4 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 }
 
 export default SingleChat
+

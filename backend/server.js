@@ -9,9 +9,24 @@ import messageRoutes from "./routes/messageRoutes.js";
 import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
 import { Server } from "socket.io";
 import path from "path";
+import cors from "cors";
 
 const app = express();
 dotenv.config();
+
+// Enable CORS for development
+if (process.env.NODE_ENV === "development") {
+    app.use(cors({
+        origin: ["http://localhost:5173", "http://localhost:5174"],
+        credentials: true
+    }));
+} else {
+    app.use(cors({
+        origin: process.env.RENDER_EXTERNAL_URL || "https://chatterbox-4r53.onrender.com",
+        credentials: true
+    }));
+}
+
 connectDB();
 app.use(express.json()); // to accept json data
 
@@ -23,14 +38,20 @@ app.use("/api/message", messageRoutes);
 
 const __dirname = path.resolve();
 if (process.env.NODE_ENV === "production") {
-    app.use(express.static(path.join(__dirname, "/frontend/dist")));
-    app.get("*", (req, res) => {
-        res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
+    // Serve frontend files from the correct path in production
+    app.use(express.static(path.join(__dirname, "../frontend/dist")));
+    
+    app.get(/\/(?!api|socket.io).*$/, (req, res) => {
+        // This regex matches any route that doesn't start with /api or /socket.io
+        res.sendFile(path.resolve(__dirname, "../frontend", "dist", "index.html"));
     });
 } else {
     app.get("/", (req, res) => {
         res.send("API is running...");
     });
+    
+    // In development, don't register catch-all route for frontend files
+    // since they don't exist until built
 }
 
 
@@ -48,7 +69,8 @@ const server = app.listen(PORT, () => {
 const io = new Server(server, {
     pingTimeout: 60000,
     cors: {
-        origin: "http://localhost:5173",
+        origin: process.env.NODE_ENV === "production" ? process.env.RENDER_EXTERNAL_URL || "https://chatterbox-4r53.onrender.com" : ["http://localhost:5173", "http://localhost:5174", "http://localhost:5175"],
+        credentials: true
     },
 });
 

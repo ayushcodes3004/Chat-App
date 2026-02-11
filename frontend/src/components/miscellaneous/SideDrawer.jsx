@@ -9,7 +9,7 @@ import { Avatar, Portal } from "@chakra-ui/react"
 import { ChatState } from "../../Context/ChatProvider.jsx"
 import ProfileModal from './ProfileModal.jsx';
 import { useHistory } from "react-router-dom";
-import axios from "axios";
+import api from '../../config/axiosConfig';
 import ChatLoading from '../ChatLoading.jsx';
 import UserListItem from '../UserAvatar/UserListItem.jsx';
 
@@ -50,7 +50,7 @@ const SideDrawer = () => {
                 },
             };
 
-            const { data } = await axios.get(`/api/user?search=${search}`, config);
+            const { data } = await api.get(`/api/user?search=${search}`, config);
 
             setLoading(false);
             if (!data.length) {
@@ -83,7 +83,7 @@ const SideDrawer = () => {
                     Authorization: `Bearer ${user.token}`,
                 },
             };
-            const { data } = await axios.post(`/api/chat`, { userId }, config);
+            const { data } = await api.post(`/api/chat`, { userId }, config);
 
             if (!chats.find((c) => c._id === data._id)) setChats([data, ...chats]);
             setSelectedChat(data);

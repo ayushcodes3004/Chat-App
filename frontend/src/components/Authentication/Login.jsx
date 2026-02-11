@@ -1,7 +1,7 @@
 import React from 'react'
 import { VStack, Field, Input, InputGroup, Button } from "@chakra-ui/react"
 import { toaster } from "@/components/ui/toaster"
-import axios from 'axios'
+import api from '../../config/axiosConfig'
 import { useHistory } from 'react-router-dom'
 
 
@@ -32,7 +32,7 @@ const Login = () => {
                     "Content-type": "application/json",
                 },
             };
-            const { data } = await axios.post(
+            const { data } = await api.post(
                 "/api/user/login",
                 { email, password },
                 config

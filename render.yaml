@@ -1,0 +1,19 @@
+services:
+  # Single service to host both backend and frontend
+  - type: web
+    name: chat-app
+    env: node
+    buildCommand: npm install && cd frontend && npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGO_URI
+        sync: false  # Set this in the Render dashboard
+      - key: JWT_SECRET
+        sync: false  # Set this in the Render dashboard
+      - key: CLOUDINARY_URL
+        sync: false  # Set this in the Render dashboard
+      - key: RENDER_EXTERNAL_URL
+        sync: false  # Automatically set by Render (your app's external URL)
+    autoDeploy: false  # Set to true after initial setup

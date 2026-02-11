@@ -1,6 +1,6 @@
 import { Box, Stack, Text, Button, Group } from "@chakra-ui/react";
 import { toaster } from "@/components/ui/toaster";
-import axios from "axios";
+import api from "../config/axiosConfig";
 import { useEffect, useState } from "react";
 import { getSender } from "../config/ChatLogics";
 import ChatLoading from "./ChatLoading";
@@ -21,7 +21,7 @@ const MyChats = ({ fetchAgain }) => {
                 },
             };
 
-            const { data } = await axios.get("/api/chat", config);
+            const { data } = await api.get("/api/chat", config);
             setChats(data);
         } catch (error) {
             toaster.create({
