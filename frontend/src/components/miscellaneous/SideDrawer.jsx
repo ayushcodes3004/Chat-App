@@ -20,8 +20,12 @@ const SideDrawer = () => {
     const [loadingChat, setLoadingChat] = React.useState(false);
     const [isDrawerOpen, setIsDrawerOpen] = React.useState(false);
     const [isProfileOpen, setIsProfileOpen] = React.useState(false);
-    const { user, chats, setChats, setSelectedChat } = ChatState();
+    const { user, chats, setChats, setSelectedChat, notification, setNotification } = ChatState();
     const history = useHistory();
+
+    const getSender = (loggedUser, users) => {
+        return users[0]._id === loggedUser._id ? users[1].name : users[0].name;
+    };
     const logoutHandler = () => {
         localStorage.removeItem("userInfo");
         history.push("/");
@@ -109,24 +113,60 @@ const SideDrawer = () => {
                 </Tooltip>
                 <Text fontSize="2xl" fontFamily="Work sans">Chat App</Text>
                 <div>
-                    <Menu.Root>
-                        <Menu.Trigger asChild>
-                            <Button p={1} bg="white" _focus={{ outline: "none", boxShadow: "none" }}>
-                                <Icon as={FaBell} fontSize="2xl" m={1} color="black" />
-                            </Button>
-                        </Menu.Trigger>
-                        {/* <Portal>
-                            <Menu.Positioner>
-                                <Menu.Content>
-                                    <Menu.Item value="new-txt">New Text File</Menu.Item>
-                                    <Menu.Item value="new-file">New File...</Menu.Item>
-                                    <Menu.Item value="new-win">New Window</Menu.Item>
-                                    <Menu.Item value="open-file">Open File...</Menu.Item>
-                                    <Menu.Item value="export">Export</Menu.Item>
-                                </Menu.Content>
-                            </Menu.Positioner>
-                        </Portal> */}
-                    </Menu.Root>
+                    <Box position="relative" display="inline-block">
+                        <Menu.Root>
+                            <Menu.Trigger asChild>
+                                <Button p={1} bg="white" _focus={{ outline: "none", boxShadow: "none" }} position="relative">
+                                    <Icon as={FaBell} fontSize="2xl" m={1} color="black" />
+                                </Button>
+                            </Menu.Trigger>
+                            <Portal>
+                                <Menu.Positioner>
+                                    <Menu.Content>
+                                        {!notification?.length && (
+                                            <Box p={4} textAlign="center">
+                                                <Text>No New Messages</Text>
+                                            </Box>
+                                        )}
+                                        {notification?.map((notif) => (
+                                            <Menu.Item
+                                                key={notif._id}
+                                                value={notif._id}
+                                                onClick={() => {
+                                                    setSelectedChat(notif.chat);
+                                                    setNotification(notification.filter((n) => n._id !== notif._id));
+                                                }}
+                                            >
+                                                {notif.chat.isGroupChat
+                                                    ? `New Message in ${notif.chat.chatName}`
+                                                    : `New Message from ${getSender(user, notif.chat.users)}`}
+                                            </Menu.Item>
+                                        ))}
+                                    </Menu.Content>
+                                </Menu.Positioner>
+                            </Portal>
+                        </Menu.Root>
+                        {notification?.length > 0 && (
+                            <Box
+                                position="absolute"
+                                top="0"
+                                right="0"
+                                transform="translate(30%, -30%)"
+                                borderRadius="full"
+                                bg="red.500"
+                                color="white"
+                                fontSize="0.7em"
+                                minW="18px"
+                                h="18px"
+                                display="flex"
+                                alignItems="center"
+                                justifyContent="center"
+                                px={1}
+                            >
+                                {notification.length}
+                            </Box>
+                        )}
+                    </Box>
                     <Menu.Root>
                         <Menu.Trigger asChild>
                             <Button variant='ghost' _focus={{ outline: "none", boxShadow: "none" }}>
