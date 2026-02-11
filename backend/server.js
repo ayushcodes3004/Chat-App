@@ -69,7 +69,7 @@ const server = app.listen(PORT, () => {
 const io = new Server(server, {
     pingTimeout: 60000,
     cors: {
-        origin: process.env.NODE_ENV === "production" ? process.env.RENDER_EXTERNAL_URL || "https://chatterbox-4r53.onrender.com" : ["http://localhost:5173", "http://localhost:5174", "http://localhost:5175"],
+        origin: process.env.NODE_ENV === "production" ? process.env.RENDER_EXTERNAL_URL || "https://chatterbox-4r53.onrender.com" : ["http://localhost:5173", "http://localhost:5174"],
         credentials: true
     },
 });
